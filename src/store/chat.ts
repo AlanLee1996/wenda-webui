@@ -1,0 +1,144 @@
+import { defineStore } from 'pinia'
+import { nanoid } from "nanoid";
+import dayjs from 'dayjs';
+import axios from 'axios';
+export const useChatStore = defineStore('chat', {
+    state: () => ({
+        //当前激活的对话id
+        activeConversationId:"1",
+        //输入框的消息
+        inputMessage:"",
+        //最后问模型的问题
+        finallyPrompt:"",
+        //是否正在发送消息
+        isSending:false,
+        //会话列表
+        conversationList: [
+            {
+                conversationId: "1",
+                title:'新的对话1',
+                time: '2023-01-02 12:00:00',
+                msgCount: 3,
+            },
+        ],
+        //消息列表
+        messageList:[
+            {
+                conversationId: "1",
+                history:[
+                    { messageId:'123123',role: "AI", content: '你好，有什么我能帮助您的？',time: '2023-01-02 12:00:00' },
+                ]
+            },
+        ],
+        temperature: 0.9,
+		max_length: 2048,
+		top_p: 0.3,
+        zhishiku: true,
+    }),
+    getters: {
+        
+    },
+    actions: {
+        //获取某个会话的消息列表
+        getMessageByConversationId(conversationId: string) {
+            return this.messageList.find((item) => item.conversationId === conversationId);
+        },
+        //新建会话
+        createConversation(){
+            let conversationId = nanoid();
+            let time=dayjs().format("YYYY-MM-DD hh:mm:ss");
+
+            this.conversationList.unshift({
+                conversationId: conversationId,
+                title:'新的会话',
+                time: time,
+                msgCount: 1,
+            });
+            this.messageList.unshift({
+                conversationId:conversationId,
+                history:[
+                    { messageId:nanoid(),role: "AI", content: '你好，有什么我能帮助您的？',time:time },
+                ],
+            });
+            this.activeConversationId=conversationId;
+
+        },
+        //发送消息
+        async sendMessage(lastMsg: any){
+            let sendtime=dayjs().format("YYYY-MM-DD hh:mm:ss");
+
+            // let messageSend = {
+            //     messageId:nanoid(),
+            //     role:'user',
+            //     content:this.finallyPrompt,
+            //     time:sendtime
+            // }
+            // let messageList = this.getMessageByConversationId(this.activeConversationId);
+            // messageList.history.push(messageSend);
+            
+            
+            //中断控制
+            let controller = new AbortController();
+            let signal = controller.signal;
+            let sendStop = () => {
+                controller.abort()
+                controller = new AbortController();
+                signal = controller.signal;
+            }
+
+            //发送消息
+            try {
+                
+				let response = await fetch(import.meta.env.VITE_WENDA_URL+"/api/chat_stream", {
+					signal: signal,
+					method: 'post',
+					body: JSON.stringify({
+						//prompt: app.会话模式.问题 + this.finallyPrompt,
+                        prompt: this.finallyPrompt,
+						temperature: this.temperature,
+						top_p: this.top_p,
+						max_length: this.max_length,
+						//history: messageList.history,
+                        history:[],
+						zhishiku: this.zhishiku
+					}),
+					headers: {
+						'Content-Type': 'application/json'
+					}
+				})
+				this.inputMessage = '';
+				const reader = response.body.getReader();
+				let buffer = '';
+				while (true) {
+					let { value, done } = await reader.read();
+					let res = new TextDecoder("utf-8").decode(value)
+					buffer += res
+					while (buffer.indexOf("///") > -1) {
+						if (buffer == '/././') {//应对网络问题
+							done = true
+							break
+						}
+						let bufferArr = buffer.split("///");
+                        let currContent=bufferArr[bufferArr.length - 2];
+                        currContent=currContent.replace("### 来源：","<br> ***来源：***");
+						lastMsg.content = currContent;
+                        //console.log(currContent);
+                        
+						buffer = bufferArr[bufferArr.length - 1];
+					}
+					if (done) break
+				}
+                this.isSending=false;
+			} catch(e) { 
+                console.log(e);
+                
+                sendStop();
+                messageAI.content='网络错误';
+                this.isSending=false;
+            }
+
+            
+        }
+
+    },
+})
