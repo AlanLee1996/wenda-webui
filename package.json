@@ -17,7 +17,8 @@
     "nanoid": "^4.0.2",
     "pinia": "^2.0.34",
     "prismjs": "^1.29.0",
-    "vue": "^3.2.47"
+    "vue": "^3.2.47",
+    "vue-clipboard3": "^2.0.0"
   },
   "devDependencies": {
     "@iconify-json/ep": "^1.1.10",

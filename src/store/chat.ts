@@ -18,7 +18,7 @@ export const useChatStore = defineStore('chat', {
                 conversationId: "1",
                 title:'新的对话1',
                 time: '2023-01-02 12:00:00',
-                msgCount: 3,
+                msgCount: 1,
             },
         ],
         //消息列表
@@ -33,6 +33,7 @@ export const useChatStore = defineStore('chat', {
         temperature: 0.9,
 		max_length: 2048,
 		top_p: 0.3,
+        //是否使用知识库
         zhishiku: true,
     }),
     getters: {
@@ -63,19 +64,29 @@ export const useChatStore = defineStore('chat', {
             this.activeConversationId=conversationId;
 
         },
+        //删除会话
+        deleteConversation(conversationId: string){
+            let index=this.conversationList.findIndex((item) => item.conversationId === conversationId);
+            this.conversationList.splice(index,1);
+            this.messageList.splice(index,1);
+            //如果删除的是最后一个会话,则新建一个会话
+            if(this.conversationList.length===0){
+                this.createConversation();
+            }
+            //激活第一个会话
+            this.activeConversationId=this.conversationList[0].conversationId;
+        },
+        //删除消息
+        deleteMessage(messageId: string){
+            let messageList=this.getMessageByConversationId(this.activeConversationId);
+            let index=messageList.history.findIndex((item) => item.messageId === messageId);
+            messageList.history.splice(index,1);
+            
+        },
+
         //发送消息
         async sendMessage(lastMsg: any){
             let sendtime=dayjs().format("YYYY-MM-DD hh:mm:ss");
-
-            // let messageSend = {
-            //     messageId:nanoid(),
-            //     role:'user',
-            //     content:this.finallyPrompt,
-            //     time:sendtime
-            // }
-            // let messageList = this.getMessageByConversationId(this.activeConversationId);
-            // messageList.history.push(messageSend);
-            
             
             //中断控制
             let controller = new AbortController();
@@ -100,7 +111,7 @@ export const useChatStore = defineStore('chat', {
 						max_length: this.max_length,
 						//history: messageList.history,
                         history:[],
-						zhishiku: this.zhishiku
+						zhishiku: false
 					}),
 					headers: {
 						'Content-Type': 'application/json'
@@ -120,7 +131,7 @@ export const useChatStore = defineStore('chat', {
 						}
 						let bufferArr = buffer.split("///");
                         let currContent=bufferArr[bufferArr.length - 2];
-                        currContent=currContent.replace("### 来源：","<br> ***来源：***");
+                        //currContent=currContent.replace("### 来源：","<br> ***来源：***");
 						lastMsg.content = currContent;
                         //console.log(currContent);
                         
@@ -133,7 +144,7 @@ export const useChatStore = defineStore('chat', {
                 console.log(e);
                 
                 sendStop();
-                messageAI.content='网络错误';
+                lastMsg.content='网络错误';
                 this.isSending=false;
             }
 

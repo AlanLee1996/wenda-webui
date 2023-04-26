@@ -32,6 +32,8 @@
         v-for="conversation in conversationList"
         :key="conversation.conversationId"
         style="height: 63px"
+        @mouseover="hoverConversationId = conversation.conversationId"
+        @mouseleave="hoverConversationId = ''"
       >
         <el-card
           shadow="never"
@@ -41,6 +43,7 @@
             border-radius: 5px;
             margin-top: 10px;
             cursor: pointer;
+            position: relative;
           "
           :style="{
             border:
@@ -73,10 +76,31 @@
                 padding: 5px;
               "
             >
-              <el-text>{{ conversation.msgCount }}条记录</el-text>
+              <el-text
+                >{{
+                  getConversationHistoryCount(conversation.conversationId)
+                }}条记录</el-text
+              >
               <el-text>{{ conversation.time }}</el-text>
             </div>
           </div>
+          <el-popconfirm
+            title="确认要删除这个对话?"
+            confirm-button-text="是"
+            cancel-button-text="否"
+            @confirm="chatStore.deleteConversation(conversation.conversationId)"
+          >
+            <template #reference>
+              <el-button
+                v-show="conversation.conversationId == hoverConversationId"
+                size="small"
+                type="danger"
+                plain
+                style="position: absolute; top: 18px; right: 10px"
+                >删除</el-button
+              >
+            </template>
+          </el-popconfirm>
         </el-card>
       </div>
     </el-scrollbar>
@@ -90,10 +114,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useChatStore } from "~/store/chat";
 import { useDark, useToggle } from "@vueuse/core";
+import { relative } from "path";
 
 const isDark = useDark();
 
@@ -109,5 +134,14 @@ let chatStore = useChatStore();
 const { conversationList, messageList, activeConversationId } =
   storeToRefs(chatStore);
 activeConversationId.value = messageList.value[0].conversationId;
+
+//会话删除按钮
+const hoverConversationId = ref("");
+const getConversationHistoryCount = (conversationId: string) => {
+  let msgList = messageList.value.filter((message) => {
+    return message.conversationId == conversationId;
+  });
+  return msgList[0].history.length;
+};
 </script>
-<style scoped></style>
+<style lang="scss"></style>

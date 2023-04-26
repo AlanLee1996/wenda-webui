@@ -1,5 +1,5 @@
 <template>
-  <el-config-provider namespace="ep" style="width: 100%">
+  <el-config-provider namespace="ep">
     <el-container style="min-height: 100vh; min-width: 100%">
       <BaseSide style="width: 300px" />
       <div style="min-width: calc(100% - 300px)">
@@ -37,6 +37,15 @@ watch(
   },
   { immediate: true }
 );
+
+//部分store持久化
+let l1 = localStorage.getItem("chatStore_001");
+if (l1) {
+  chatStore.$patch(JSON.parse(l1));
+}
+chatStore.$subscribe((_, state) => {
+  localStorage.setItem("chatStore_001", JSON.stringify(state));
+});
 </script>
 
 <style>
