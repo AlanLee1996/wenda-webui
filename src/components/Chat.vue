@@ -334,10 +334,18 @@ const copyLastMessage = () => {
                 @click="copy(message.content)"
               >
                 <div v-if="message.role == 'AI'" style="margin-right: 10px">
-                  <Logo
+                  <!-- <Logo
                     :width="30"
                     :height="30"
                     :color="isDark ? 'white' : 'black'"
+                  /> -->
+                  <img
+                    src="/head.png"
+                    alt=""
+                    style="width: 25px; mix-blend-mode: multiply"
+                    :style="{
+                      filter: isDark ? 'invert(1)' : 'invert(0)',
+                    }"
                   />
                 </div>
                 <el-card
