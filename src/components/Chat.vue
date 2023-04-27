@@ -413,10 +413,12 @@ const copyLastMessage = () => {
       :rows="4"
       type="textarea"
       v-model="chatStore.inputMessage"
-      placeholder="请输入内容。方向上键传入上次消息。"
+      placeholder="请输入内容。方向上键传入上次消息。Ctrl+Enter直接发送"
       resize="none"
       input-style="padding-right: 120px"
       @keyup.up="copyLastMessage()"
+      @keyup.ctrl.enter="sendMessage()"
+      :disabled="chatStore.isSending"
     >
     </el-input>
     <el-button
