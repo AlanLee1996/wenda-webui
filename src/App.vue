@@ -43,6 +43,7 @@ let l1 = localStorage.getItem("chatStore_001");
 if (l1) {
   chatStore.$patch(JSON.parse(l1));
 }
+chatStore.isSending = false;
 chatStore.$subscribe((_, state) => {
   localStorage.setItem("chatStore_001", JSON.stringify(state));
 });
