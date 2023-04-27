@@ -378,7 +378,7 @@ const copyLastMessage = () => {
                       v-for="source in message.source"
                       placement="top-start"
                       :title="`数据来源:${getSorceInfo(source, 'title')}`"
-                      :width="300"
+                      :width="500"
                       trigger="hover"
                       :content="getSorceInfo(source, 'content')"
                     >
