@@ -328,11 +328,7 @@ const copyLastMessage = () => {
               >
             </div>
             <template #reference>
-              <div
-                style="display: flex"
-                v-if="message.role != 'ui'"
-                @click="copy(message.content)"
-              >
+              <div style="display: flex" v-if="message.role != 'ui'">
                 <div v-if="message.role == 'AI'" style="margin-right: 10px">
                   <!-- <Logo
                     :width="30"
