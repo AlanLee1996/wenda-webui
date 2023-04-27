@@ -16,12 +16,23 @@
 - chatpdf（待完成）
 - 类似于 autogpt 的功能（待完成）
 
-### todo
+### demo 演示
+
+![会话管理](https://github.com/AlanLee1996/wenda-webui/blob/main/public/demo/%E4%BC%9A%E8%AF%9D%E7%AE%A1%E7%90%86%E5%8A%9F%E8%83%BD.png?raw=true)
+![夜间模式](https://github.com/AlanLee1996/wenda-webui/blob/main/public/demo/%E5%A4%9C%E9%97%B4%E6%A8%A1%E5%BC%8F.png?raw=true)
+![消息功能](https://github.com/AlanLee1996/wenda-webui/blob/main/public/demo/%E5%AE%8C%E6%95%B4%E7%9A%84%E6%B6%88%E6%81%AF%E5%8A%9F%E8%83%BD.png?raw=true)
+![消息来源查看](https://github.com/AlanLee1996/wenda-webui/blob/main/public/demo/%E6%B6%88%E6%81%AF%E6%9D%A5%E6%BA%90%E6%9F%A5%E7%9C%8B.png?raw=true)
+
+### TodoList
 
 - [x] 基础功能
 - [ ] 设置项
 - [ ] 适配手机
 - [ ] 闻达 auto
+
+### 更新内容
+
+- 2023/4/27 测试版发布
 
 ### 注意
 
