@@ -60,3 +60,8 @@ npm install
 # 请在项目根目录下运行
 npm run dev
 ```
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=AlanLee1996/wenda-webui&type=Date)](https://star-history.com/#AlanLee1996/wenda-webui&Date)
+
