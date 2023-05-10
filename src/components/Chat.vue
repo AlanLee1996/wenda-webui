@@ -133,7 +133,7 @@ const getKnowledge = (parentMessageId: string, isRetry: boolean) => {
 
         //合并数据源并生成prompt
         chatStore.finallyPrompt =
-          `system: 请扮演一名专业分析师，根据以下数据内容回答问题：${chatStore.inputMessage}\n。如果您认为给出的内容和问题无关，请忽略该数据内容再回答。` +
+          `system: 请扮演一名专业分析师，根据以下内容回答问题：${chatStore.inputMessage}\n。如果您认为给出的内容和问题无关或没有提出问题，请忽略该数据内容再回答。` +
           response.data.map((i: any) => i.content).join("\n");
 
         chatStore.sendMessage(lastMsg);
