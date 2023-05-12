@@ -12,6 +12,8 @@ export const useChatStore = defineStore('chat', {
         finallyPrompt:"",
         //是否正在发送消息
         isSending:false,
+        //是否中断
+        isAbort:false,
         //会话列表
         conversationList: [
             {
@@ -96,6 +98,9 @@ export const useChatStore = defineStore('chat', {
                 controller = new AbortController();
                 signal = controller.signal;
             }
+            function MyException(message:string) {
+                lastMsg.content = message;
+            }
 
             //发送消息
             try {
@@ -120,7 +125,7 @@ export const useChatStore = defineStore('chat', {
 				this.inputMessage = '';
 				const reader = response.body.getReader();
 				let buffer = '';
-				while (true) {
+				while (!this.isAbort) {
 					let { value, done } = await reader.read();
 					let res = new TextDecoder("utf-8").decode(value)
 					buffer += res
@@ -139,6 +144,8 @@ export const useChatStore = defineStore('chat', {
 					}
 					if (done) break
 				}
+                sendStop();
+				
                 this.isSending=false;
 			} catch(e) { 
                 console.log(e);

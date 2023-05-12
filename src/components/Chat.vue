@@ -38,10 +38,19 @@ const state = reactive({});
 
 //发送按钮事件
 const sendMessage = () => {
+  //如果在发送状态则终止发送
+  if (chatStore.isSending) {
+    chatStore.isAbort = true;
+    console.log(chatStore.isAbort);
+
+    chatStore.isSending = false;
+    return;
+  }
   if (chatStore.inputMessage.length == 0) {
     ElMessage.warning("消息不能为空");
     return;
   }
+  chatStore.isAbort = false;
   chatStore.isSending = true;
   //先显示用户发送的消息
   let sendtime = dayjs().format("YYYY-MM-DD hh:mm:ss");
@@ -66,6 +75,8 @@ const retryMessage = (messageId: string) => {
     ElMessage.warning("当前正在发送消息，无法重试");
     return;
   }
+  chatStore.isAbort = false;
+  chatStore.isSending = true;
   getKnowledge(messageId, true);
 };
 
@@ -116,6 +127,10 @@ const getKnowledge = (parentMessageId: string, isRetry: boolean) => {
         messageList.history = messageList.history.filter(
           (i: any) => i.role != "ui"
         );
+        //如果已经终止发送
+        if (chatStore.isAbort) {
+          return;
+        }
         //如果不是重试
         if (!isRetry) {
           //给机器人添加等待效果
@@ -427,14 +442,13 @@ const copyLastMessage = () => {
     </el-input>
     <el-button
       round
-      color="#79b7d1"
+      :color="chatStore.isSending ? '#ef534f' : '#79b7d1'"
       :dark="isDark"
       plain
       style="position: absolute; right: 10px; top: 30px"
       @click="sendMessage()"
-      :loading="chatStore.isSending"
     >
-      发送
+      {{ chatStore.isSending ? "终止" : "发送" }}
     </el-button>
   </div>
 </template>
