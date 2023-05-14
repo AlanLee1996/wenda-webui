@@ -11,7 +11,7 @@
 - 完整的会话管理功能
 - 支持各种快捷键
 - 会话中可直接看到知识库来源
-- 支持自定义会话角色
+- 支持自定义会话角色（待完成）
 - 知识库来源可自定义（待完成）
 - chatpdf（待完成）
 - 类似于 autogpt 的功能（待完成）
@@ -26,12 +26,13 @@
 ### TodoList
 
 - [x] 基础功能
-- [ ] 设置项
+- [x] 设置项
 - [ ] 适配手机
 - [ ] 闻达 auto
 
 ### 更新内容
 
+- 2023/5/15 完善配置文件和设置功能
 - 2023/4/27 测试版发布
 
 ### 注意
@@ -64,4 +65,3 @@ npm run dev
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=AlanLee1996/wenda-webui&type=Date)](https://star-history.com/#AlanLee1996/wenda-webui&Date)
-
