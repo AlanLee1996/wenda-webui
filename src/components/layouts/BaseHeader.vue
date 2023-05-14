@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ElMessage, ElMessageBox } from "element-plus";
 import { toggleDark } from "~/composables";
-import { ref } from "vue";
+import { ref, reactive, getCurrentInstance } from "vue";
 import { useChatStore } from "~/store/chat";
 import { storeToRefs } from "pinia";
 let chatStore = useChatStore();
@@ -21,9 +21,16 @@ const about = () => {
     }
   );
 };
+const settingsDialog = ref();
+const currentInstance = getCurrentInstance();
 const settings = () => {
-  ElMessage.warning("暂未开放");
+  //console.log(currentInstance.ctx.$refs.settingsDialog.visible);
+  currentInstance.ctx.$refs.settingsDialog.visible = true;
 };
+const settingsDisplay = ref(false);
+const reactiveObj = reactive({
+  settingsDisplay,
+});
 </script>
 
 <template>
@@ -59,4 +66,5 @@ const settings = () => {
       关于
     </button>
   </div>
+  <Settings ref="settingsDialog"></Settings>
 </template>

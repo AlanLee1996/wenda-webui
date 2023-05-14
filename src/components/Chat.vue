@@ -20,6 +20,7 @@ const copy = async (content: string) => {
 };
 
 const isDark = useDark();
+const AI_AVATAR = ref(import.meta.env.VITE_AI_AVATAR);
 
 let chatStore = useChatStore();
 const { conversationList, messageList, activeConversationId } =
@@ -41,7 +42,7 @@ const sendMessage = () => {
   //如果在发送状态则终止发送
   if (chatStore.isSending) {
     chatStore.isAbort = true;
-    console.log(chatStore.isAbort);
+    //console.log(chatStore.isAbort);
 
     chatStore.isSending = false;
     return;
@@ -147,9 +148,12 @@ const getKnowledge = (parentMessageId: string, isRetry: boolean) => {
         }
 
         //合并数据源并生成prompt
-        chatStore.finallyPrompt =
-          `system: 请扮演一名专业分析师，根据以下内容回答问题：${chatStore.inputMessage}\n。如果您认为给出的内容和问题无关或没有提出问题，请忽略该数据内容再回答。` +
-          response.data.map((i: any) => i.content).join("\n");
+        chatStore.finallyPrompt = chatStore.promptTemplate
+          .replace("{{问题}}", chatStore.inputMessage)
+          .replace(
+            "{{知识库}}",
+            response.data.map((i: any) => i.content).join("\n")
+          );
 
         chatStore.sendMessage(lastMsg);
       })
@@ -351,7 +355,7 @@ const copyLastMessage = () => {
                     :color="isDark ? 'white' : 'black'"
                   /> -->
                   <img
-                    src="/head.png"
+                    :src="AI_AVATAR"
                     alt=""
                     style="width: 25px; mix-blend-mode: multiply"
                     :style="{

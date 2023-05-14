@@ -8,11 +8,13 @@
   >
     <div style="padding: 40px 0px 40px 30px; width: 300px">
       <div style="display: flex; justify-content: flex-start">
-        <el-text style="font-size: 20px; font-weight: bolder"> 闻 达 </el-text>
+        <el-text style="font-size: 20px; font-weight: bolder">
+          {{ title }}
+        </el-text>
       </div>
       <div style="display: flex; justify-content: flex-start">
         <el-text style="font-size: 15px; opacity: 0.5">
-          大规模语言模型调用平台
+          {{ subtitle }}
         </el-text>
       </div>
     </div>
@@ -123,6 +125,8 @@ import { relative } from "path";
 const isDark = useDark();
 
 const isCollapse = ref(true);
+const title = ref(import.meta.env.VITE_APP_TITLE);
+const subtitle = ref(import.meta.env.VITE_APP_SUBTITLE);
 
 const handleOpen = (key: string, keyPath: string[]) => {
   console.log(key, keyPath);

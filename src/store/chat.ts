@@ -37,6 +37,8 @@ export const useChatStore = defineStore('chat', {
 		top_p: 0.3,
         //是否使用知识库
         zhishiku: true,
+        //prompt模板
+        promptTemplate: `system: 请扮演一名专业分析师，根据以下内容用中文回答问题：{{问题}}\n。如果您认为给出的内容和问题无关或没有提出问题，请忽略该数据内容再用中文回答。{{知识库}}`,
     }),
     getters: {
         
