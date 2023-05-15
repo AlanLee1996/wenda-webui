@@ -1,8 +1,15 @@
 <template>
   <el-config-provider namespace="ep">
     <el-container style="min-height: 100vh; min-width: 100%">
-      <BaseSide style="width: 300px" v-show="showSide" />
-      <div :style="{ minWidth: showSide ? 'calc(100% - 300px)' : '100%' }">
+      <BaseSide
+        style=""
+        v-show="showSide"
+        :style="{ width: isMobile ? '100vw' : '300px' }"
+      />
+      <div
+        :style="{ width: getMainWidth() }"
+        v-show="!isMobile || (isMobile && !showSide)"
+      >
         <BaseHeader />
         <el-main>
           <!-- <HelloWorld msg="Hello Vue 3.0 + Element Plus + Vite" /> -->
@@ -24,7 +31,7 @@ const isDark = useDark();
 
 let chatStore = useChatStore();
 let appStore = useAppStore();
-const { showSide } = storeToRefs(appStore);
+const { showSide, isMobile } = storeToRefs(appStore);
 
 const { conversationList, messageList, activeConversationId } =
   storeToRefs(chatStore);
@@ -41,6 +48,21 @@ watch(
   },
   { immediate: true }
 );
+const getMainWidth = () => {
+  if (showSide.value) {
+    if (isMobile.value) {
+      return "0px";
+    } else {
+      return "calc(100% - 300px)";
+    }
+  } else {
+    if (isMobile.value) {
+      return "100vw";
+    } else {
+      return "100vw";
+    }
+  }
+};
 
 //部分store持久化
 let l1 = localStorage.getItem("chatStore_001");
@@ -62,6 +84,8 @@ appStore.isMobile = window.innerWidth < 768;
 //菜单自动收缩
 if (appStore.isMobile) {
   appStore.showSide = false;
+} else {
+  appStore.showSide = true;
 }
 appStore.$subscribe((_, state) => {
   localStorage.setItem("appStore_001", JSON.stringify(state));

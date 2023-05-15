@@ -2,13 +2,15 @@
 import { ElMessage, ElMessageBox } from "element-plus";
 import { toggleDark } from "~/composables";
 import { ref, reactive, getCurrentInstance } from "vue";
+
 import { useChatStore } from "~/store/chat";
-import { useAppStore } from "~/store/app";
 import { storeToRefs } from "pinia";
 let chatStore = useChatStore();
 const { zhishiku } = storeToRefs(chatStore);
+
+import { useAppStore } from "~/store/app";
 let appStore = useAppStore();
-const { showSide } = storeToRefs(appStore);
+const { showSide, isMobile } = storeToRefs(appStore);
 
 const about = () => {
   ElMessageBox.alert(
@@ -51,21 +53,24 @@ const toggleSide = () => {
           <i inline-flex i="ep-operation" v-if="!showSide" />
         </button>
       </div>
-      <span>测试</span>
+      <span>聊天</span>
     </div>
     <div style="display: flex; justify-content: end; width: 100%">
       <div style="display: flex; margin-right: 20px">
-        <div style="margin-top: 17px">知识库</div>
         <el-switch
           v-model="zhishiku"
           style="margin-left: 5px; margin-top: 12px"
+          inline-prompt
+          active-text="知识库"
+          inactive-text="知识库"
         />
       </div>
       <button
         class="border-none bg-transparent cursor-pointer"
         @click="settings()"
       >
-        设置
+        <span v-if="!isMobile">设置</span>
+        <i v-if="isMobile" inline-flex i="ep-setting" />
       </button>
       <div @click="toggleDark()" style="width: 60px">
         <button
@@ -80,7 +85,8 @@ const toggleSide = () => {
         @click="about()"
         style="margin-right: 20px"
       >
-        关于
+        <span v-if="!isMobile">关于</span>
+        <i v-if="isMobile" inline-flex i="ep-star" />
       </button>
     </div>
   </div>

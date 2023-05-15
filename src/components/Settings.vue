@@ -1,5 +1,5 @@
 <template>
-  <el-dialog v-model="visible" title="设置">
+  <el-dialog v-model="visible" title="设置" :fullscreen="isMobile">
     <div class="slider-block">
       <span class="demonstration">Token限制</span>
       <el-slider
@@ -50,6 +50,11 @@
 <script lang="ts" setup>
 import { ref, reactive, toRefs, onMounted, watch } from "vue";
 import { useChatStore } from "~/store/chat";
+
+import { storeToRefs } from "pinia";
+import { useAppStore } from "~/store/app";
+let appStore = useAppStore();
+const { showSide, isMobile } = storeToRefs(appStore);
 
 let chatStore = useChatStore();
 const visible = ref(false);

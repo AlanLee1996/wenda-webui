@@ -27,7 +27,7 @@ let chatStore = useChatStore();
 const { conversationList, messageList, activeConversationId } =
   storeToRefs(chatStore);
 let appStore = useAppStore();
-const { showSide } = storeToRefs(appStore);
+const { showSide, isMobile } = storeToRefs(appStore);
 
 const props = defineProps({
   conversationId: {
@@ -368,12 +368,12 @@ const copyLastMessage = () => {
                 </div>
                 <el-card
                   shadow="hover"
-                  style="
-                    max-width: calc((100vw - 100px) / 2);
-                    padding: 0px !important;
-                  "
+                  style="padding: 0px !important"
                   :style="{
                     backgroundColor: getMsgBackColor(message.role),
+                    maxWidth: isMobile
+                      ? 'calc(100vw - 100px)'
+                      : 'calc((100vw - 100px) / 2)',
                   }"
                   :body-style="{
                     padding: '5px',
