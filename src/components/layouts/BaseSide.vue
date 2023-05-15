@@ -25,7 +25,7 @@
       v-if="!isMobile"
     >
       <img
-        src="/robot.jpg"
+        :src="imgRobot"
         alt=""
         style="width: 120px; mix-blend-mode: multiply"
       />
@@ -47,7 +47,7 @@
     </div>
 
     <el-scrollbar
-      style="padding: 0px 20px 10px 20px; height: calc(100vh - 210px)"
+      style="padding: 0px 20px 10px 20px; height: calc(100% - 210px)"
     >
       <div
         v-for="conversation in conversationList"
@@ -135,6 +135,8 @@
 </template>
 
 <script lang="ts" setup>
+import imgRobot from "~/assets/robot.jpg";
+
 import { ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useChatStore } from "~/store/chat";

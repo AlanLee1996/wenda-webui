@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import imgAi from "~/assets/head.png";
+
 import { ref, reactive, toRefs, defineProps, onMounted } from "vue";
 import axios from "axios";
 import { ElMessage, ElNotification } from "element-plus";
@@ -21,7 +23,6 @@ const copy = async (content: string) => {
 };
 
 const isDark = useDark();
-const AI_AVATAR = ref(import.meta.env.VITE_AI_AVATAR);
 
 let chatStore = useChatStore();
 const { conversationList, messageList, activeConversationId } =
@@ -358,7 +359,7 @@ const copyLastMessage = () => {
                     :color="isDark ? 'white' : 'black'"
                   /> -->
                   <img
-                    :src="AI_AVATAR"
+                    :src="imgAi"
                     alt=""
                     style="width: 25px; mix-blend-mode: multiply"
                     :style="{
