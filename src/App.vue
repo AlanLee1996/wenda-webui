@@ -1,8 +1,8 @@
 <template>
   <el-config-provider namespace="ep">
     <el-container style="min-height: 100vh; min-width: 100%">
-      <BaseSide style="width: 300px" />
-      <div style="min-width: calc(100% - 300px)">
+      <BaseSide style="width: 300px" v-show="showSide" />
+      <div :style="{ minWidth: showSide ? 'calc(100% - 300px)' : '100%' }">
         <BaseHeader />
         <el-main>
           <!-- <HelloWorld msg="Hello Vue 3.0 + Element Plus + Vite" /> -->
@@ -17,11 +17,15 @@
 import { ref, watch } from "vue";
 import Chat from "~/components/Chat.vue";
 import { useChatStore } from "~/store/chat";
+import { useAppStore } from "~/store/app";
 import { storeToRefs } from "pinia";
 import { useDark, useToggle } from "@vueuse/core";
 const isDark = useDark();
 
 let chatStore = useChatStore();
+let appStore = useAppStore();
+const { showSide } = storeToRefs(appStore);
+
 const { conversationList, messageList, activeConversationId } =
   storeToRefs(chatStore);
 
@@ -43,9 +47,24 @@ let l1 = localStorage.getItem("chatStore_001");
 if (l1) {
   chatStore.$patch(JSON.parse(l1));
 }
+//默认发送状态为空
 chatStore.isSending = false;
 chatStore.$subscribe((_, state) => {
   localStorage.setItem("chatStore_001", JSON.stringify(state));
+});
+
+let l2 = localStorage.getItem("appStore_001");
+if (l2) {
+  appStore.$patch(JSON.parse(l2));
+}
+//判断是否手机端
+appStore.isMobile = window.innerWidth < 768;
+//菜单自动收缩
+if (appStore.isMobile) {
+  appStore.showSide = false;
+}
+appStore.$subscribe((_, state) => {
+  localStorage.setItem("appStore_001", JSON.stringify(state));
 });
 </script>
 

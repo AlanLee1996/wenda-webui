@@ -3,6 +3,7 @@ import { ref, reactive, toRefs, defineProps, onMounted } from "vue";
 import axios from "axios";
 import { ElMessage, ElNotification } from "element-plus";
 import { useChatStore } from "~/store/chat";
+import { useAppStore } from "~/store/app";
 import { storeToRefs } from "pinia";
 import { useDark, useToggle } from "@vueuse/core";
 import { nanoid } from "nanoid";
@@ -25,6 +26,8 @@ const AI_AVATAR = ref(import.meta.env.VITE_AI_AVATAR);
 let chatStore = useChatStore();
 const { conversationList, messageList, activeConversationId } =
   storeToRefs(chatStore);
+let appStore = useAppStore();
+const { showSide } = storeToRefs(appStore);
 
 const props = defineProps({
   conversationId: {
@@ -431,7 +434,10 @@ const copyLastMessage = () => {
       </transition>
     </div>
   </el-scrollbar>
-  <div style="position: fixed; width: calc(100% - 350px); bottom: 10px">
+  <div
+    style="position: fixed; bottom: 10px"
+    :style="{ width: showSide ? 'calc(100% - 350px)' : 'calc(100% - 50px)' }"
+  >
     <el-input
       :rows="4"
       type="textarea"
