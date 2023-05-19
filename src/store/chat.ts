@@ -158,7 +158,23 @@ export const useChatStore = defineStore('chat', {
             }
 
             
-        }
+        },
+        //存储文本进知识分区
+        async uploadToRtst(memory_name: string,title:string,txt:any) {
+            return new Promise((resolve, reject) => {
+                axios.post(import.meta.env.VITE_WENDA_URL + "/api/upload_rtst_zhishiku", {
+                    memory_name: memory_name,
+                    title: title,
+                    txt: txt,
+                })
+                .then(function (response) {
+                    resolve(response.data);
+                })
+                .catch(function (error) {
+                    reject(error);
+                });
+            });
+        },
 
     },
 })

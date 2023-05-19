@@ -5,6 +5,7 @@ import { ref, reactive, toRefs, defineProps, onMounted } from "vue";
 import axios from "axios";
 import { ElMessage, ElNotification } from "element-plus";
 import { useChatStore } from "~/store/chat";
+import { useDocChatStore } from "~/store/docChat";
 import { useAppStore } from "~/store/app";
 import { storeToRefs } from "pinia";
 import { useDark, useToggle } from "@vueuse/core";
@@ -25,19 +26,11 @@ const copy = async (content: string) => {
 const isDark = useDark();
 
 let chatStore = useChatStore();
-const { conversationList, messageList, activeConversationId } =
-  storeToRefs(chatStore);
+let docChatStore = useDocChatStore();
+
+let { messageList } = storeToRefs(docChatStore);
 let appStore = useAppStore();
 const { showSide, isMobile } = storeToRefs(appStore);
-
-const props = defineProps({
-  conversationId: {
-    type: String,
-    required: true,
-  },
-});
-
-//console.log(chatStore.getMessageByConversationId(props.conversationId));
 
 const state = reactive({});
 
@@ -66,10 +59,7 @@ const sendMessage = () => {
     content: chatStore.inputMessage,
     time: sendtime,
   };
-  let messageList = chatStore.getMessageByConversationId(
-    chatStore.activeConversationId
-  );
-  messageList.history.push(messageSend);
+  messageList.value.push(messageSend);
   //进入检索知识库流程
   getKnowledge(thisMessageId, false);
 };
@@ -88,105 +78,83 @@ const retryMessage = (messageId: string) => {
 //获取知识库数据
 const getKnowledge = (parentMessageId: string, isRetry: boolean) => {
   let sendtime = dayjs().format("YYYY-MM-DD hh:mm:ss");
-  let messageList = chatStore.getMessageByConversationId(
-    chatStore.activeConversationId
-  );
   //如果是重试
   if (isRetry) {
     //将输入框的内容设置为parentMessageId的内容
-    chatStore.inputMessage = messageList.history.find(
+    chatStore.inputMessage = messageList.find(
       (i: any) => i.messageId == parentMessageId
     ).content;
   }
   let lastMsg: any;
   //如果是重试
   if (isRetry) {
-    lastMsg = messageList.history.find(
+    lastMsg = messageList.value.find(
       (i: any) => i.parentMessageId == parentMessageId
     );
   }
-  //如果开启了知识库，则开始检索
-  if (chatStore.zhishiku) {
-    let messageSend = {
-      messageId: nanoid(),
-      role: "ui",
-      content: "正在检索数据...",
-      time: sendtime,
-    };
+  //则开始检索
+  let messageSend = {
+    messageId: nanoid(),
+    role: "ui",
+    content: "正在检索数据...",
+    time: sendtime,
+  };
 
-    let parentIndex = messageList.history.findIndex(
-      (i: any) => i.messageId == parentMessageId
-    );
-    //在parentMessageId后面插入消息
-    messageList.history.splice(parentIndex + 1, 0, messageSend);
-    let uiMsg = messageList.history[parentIndex + 1];
+  let parentIndex = messageList.value.findIndex(
+    (i: any) => i.messageId == parentMessageId
+  );
+  //在parentMessageId后面插入消息
+  messageList.value.splice(parentIndex + 1, 0, messageSend);
+  let uiMsg = messageList.value[parentIndex + 1];
 
-    //开始获取知识库
-    axios
-      .post(import.meta.env.VITE_WENDA_URL + "/api/find", {
-        prompt: chatStore.inputMessage,
-      })
-      .then(function (response) {
-        console.log(response.data);
-        //从消息数组中删除所有role为ui的消息
-        messageList.history = messageList.history.filter(
-          (i: any) => i.role != "ui"
+  //开始获取知识库
+  axios
+    .post(import.meta.env.VITE_WENDA_URL + "/api/find_rtst_in_memory", {
+      memory_name: docChatStore.doc_id,
+      prompt: chatStore.inputMessage,
+      step: 3,
+    })
+    .then(function (response) {
+      //console.log(response.data);
+
+      //从消息数组中删除所有role为ui的消息
+      messageList.value = messageList.value.filter((i: any) => i.role != "ui");
+
+      //如果已经终止发送
+      if (chatStore.isAbort) {
+        return;
+      }
+      //如果不是重试
+      if (!isRetry) {
+        //给机器人添加等待效果
+        let messageAI = {
+          messageId: nanoid(),
+          role: "AI",
+          content: "等待模型中...",
+          time: sendtime,
+          source: response.data,
+          parentMessageId: parentMessageId,
+        };
+
+        let lastIndex = messageList.value.push(messageAI);
+        lastMsg = messageList.value[lastIndex - 1];
+      }
+
+      //合并数据源并生成prompt
+      chatStore.finallyPrompt = chatStore.promptTemplate
+        .replace("{{问题}}", chatStore.inputMessage)
+        .replace(
+          "{{知识库}}",
+          response.data.map((i: any) => i.content).join("\n")
         );
-        //如果已经终止发送
-        if (chatStore.isAbort) {
-          return;
-        }
-        //如果不是重试
-        if (!isRetry) {
-          //给机器人添加等待效果
-          let messageAI = {
-            messageId: nanoid(),
-            role: "AI",
-            content: "等待模型中...",
-            time: sendtime,
-            source: response.data,
-            parentMessageId: parentMessageId,
-          };
-          let lastIndex = messageList.history.push(messageAI);
-          lastMsg = messageList.history[lastIndex - 1];
-        }
+      //console.log(chatStore.finallyPrompt);
 
-        //合并数据源并生成prompt
-        chatStore.finallyPrompt = chatStore.promptTemplate
-          .replace("{{问题}}", chatStore.inputMessage)
-          .replace(
-            "{{知识库}}",
-            response.data.map((i: any) => i.content).join("\n")
-          );
-
-        chatStore.sendMessage(lastMsg);
-      })
-      .catch(function (error) {
-        console.log(error);
-        uiMsg.content = "检索数据失败";
-      });
-  } else {
-    //给机器人添加等待效果
-    let messageAI = {
-      messageId: nanoid(),
-      role: "AI",
-      content: "等待模型中...",
-      time: sendtime,
-      source: [],
-      parentMessageId: parentMessageId,
-    };
-    //如果不是重试
-    if (!isRetry) {
-      let lastIndex = messageList.history.push(messageAI);
-      lastMsg = messageList.history[lastIndex - 1];
-    }
-
-    //生成prompt
-    chatStore.finallyPrompt = chatStore.inputMessage;
-    console.log("重试消息", lastMsg);
-
-    chatStore.sendMessage(lastMsg);
-  }
+      docChatStore.sendMessage(lastMsg);
+    })
+    .catch(function (error) {
+      console.log(error);
+      uiMsg.content = "检索数据失败";
+    });
 };
 //删除消息
 const deleteMessage = (messageId: string) => {
@@ -195,7 +163,9 @@ const deleteMessage = (messageId: string) => {
     ElMessage.warning("当前正在发送消息，无法删除");
     return;
   }
-  chatStore.deleteMessage(messageId);
+  messageList.value = messageList.value.filter(
+    (i: any) => i.messageId != messageId
+  );
 };
 
 //收到消息自动滚动到底部
@@ -219,19 +189,6 @@ const getMsgBackColor = (role: string) => {
 //跳转到数据来源
 const jumpToSource = (content: any) => {
   content = content.title;
-  if (content.indexOf("](http") != -1) {
-    const regex = /\[([^\]]+)\]\((http[s]?:\/\/[^\)]+)\)/;
-    const matches = content.match(regex);
-    if (matches) {
-      const url = matches[2]; // 获取 URL
-      console.log(`URL: ${url}`);
-      window.open(url);
-    } else {
-      ElMessage.warning("该来源无法直接打开！");
-    }
-  } else {
-    ElMessage.warning("该来源无法直接打开！");
-  }
 };
 //获取数据来源的相关信息
 const getSorceInfo = (content: any, type: string) => {
@@ -268,10 +225,8 @@ const copyLastMessage = () => {
   }
   try {
     //取到上条用户发送的消息内容
-    let messageList = chatStore.getMessageByConversationId(
-      chatStore.activeConversationId
-    );
-    let lastMsgContent = messageList.history
+    let messageList = docChatStore.docMessageList;
+    let lastMsgContent = messageList
       .filter((i: any) => i.role == "user")
       .pop().content;
     //复制到编辑框
@@ -293,13 +248,8 @@ const copyLastMessage = () => {
       <!-- 聊天内容 -->
       <transition
         name="el-zoom-in-top"
-        v-for="message in chatStore.getMessageByConversationId(
-          props.conversationId
-        )?.history"
-        :key="
-          chatStore.getMessageByConversationId(props.conversationId)
-            ?.conversationId
-        "
+        v-for="message in docChatStore.messageList"
+        :key="message.messageId"
       >
         <div
           style="display: flex; width: 100%; margin-bottom: 10px"
@@ -357,11 +307,6 @@ const copyLastMessage = () => {
             <template #reference>
               <div style="display: flex" v-if="message.role != 'ui'">
                 <div v-if="message.role == 'AI'" style="margin-right: 10px">
-                  <!-- <Logo
-                    :width="30"
-                    :height="30"
-                    :color="isDark ? 'white' : 'black'"
-                  /> -->
                   <img
                     :src="imgAi"
                     alt=""
@@ -441,7 +386,7 @@ const copyLastMessage = () => {
   </el-scrollbar>
   <div
     style="position: fixed; bottom: 10px"
-    :style="{ width: showSide ? 'calc(100% - 340px)' : 'calc(100% - 40px)' }"
+    :style="{ width: showSide ? 'calc(30% - 40px)' : 'calc(100% - 40px)' }"
   >
     <el-input
       :rows="4"

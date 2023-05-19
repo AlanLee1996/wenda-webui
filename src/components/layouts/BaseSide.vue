@@ -47,7 +47,7 @@
     </div>
 
     <el-scrollbar
-      style="padding: 0px 20px 10px 20px; height: calc(100% - 210px)"
+      style="padding: 0px 20px 10px 20px; height: calc(100% - 240px)"
     >
       <div
         v-for="conversation in conversationList"
@@ -130,7 +130,24 @@
         共{{ conversationList.length }}个会话
       </el-text>
     </div>
-    <el-button @click="chatStore.createConversation()">新建会话</el-button>
+    <div
+      style="
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+      "
+    >
+      <el-button
+        @click="chatStore.createConversation()"
+        style="margin-bottom: 5px"
+        >新建会话</el-button
+      >
+      <el-button @click="chatDocument = true" style="margin: 0"
+        >与文档对话</el-button
+      >
+    </div>
   </el-menu>
 </template>
 
@@ -145,7 +162,7 @@ import { relative } from "path";
 
 import { useAppStore } from "~/store/app";
 let appStore = useAppStore();
-const { showSide, isMobile } = storeToRefs(appStore);
+const { showSide, isMobile, chatDocument } = storeToRefs(appStore);
 
 const isDark = useDark();
 

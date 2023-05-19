@@ -9,14 +9,20 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    App: typeof import('./components/layouts/App.vue')['default']
     BaseHeader: typeof import('./components/layouts/BaseHeader.vue')['default']
     BaseSide: typeof import('./components/layouts/BaseSide.vue')['default']
     Chat: typeof import('./components/Chat.vue')['default']
+    copy: typeof import('./components/layouts/BaseHeader copy.vue')['default']
+    DocChat: typeof import('./components/DocChat.vue')['default']
+    DocHeader: typeof import('./components/layouts/DocHeader.vue')['default']
+    DocSide: typeof import('./components/layouts/DocSide.vue')['default']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCard: typeof import('element-plus/es')['ElCard']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
     ElContainer: typeof import('element-plus/es')['ElContainer']
     ElDialog: typeof import('element-plus/es')['ElDialog']
+    ElEmpty: typeof import('element-plus/es')['ElEmpty']
     ElInput: typeof import('element-plus/es')['ElInput']
     ElMain: typeof import('element-plus/es')['ElMain']
     ElMenu: typeof import('element-plus/es')['ElMenu']
@@ -29,6 +35,7 @@ declare module '@vue/runtime-core' {
     ElText: typeof import('element-plus/es')['ElText']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     Logo: typeof import('./components/logo.vue')['default']
+    PDFViewer: typeof import('./components/PDFViewer.vue')['default']
     Settings: typeof import('./components/Settings.vue')['default']
   }
 }

@@ -1,8 +1,10 @@
 <template>
   <el-config-provider namespace="ep">
-    <el-container style="min-height: 100vh; min-width: 100%">
+    <el-container
+      style="min-height: 100vh; min-width: 100%"
+      v-show="!chatDocument"
+    >
       <BaseSide
-        style=""
         v-show="showSide"
         :style="{ width: isMobile ? '100vw' : '300px' }"
       />
@@ -17,6 +19,27 @@
         </el-main>
       </div>
     </el-container>
+
+    <el-container
+      style="min-height: 100vh; min-width: 100%"
+      v-show="chatDocument"
+    >
+      <DocSide
+        v-show="showSide"
+        :style="{ width: '70%' }"
+        style="overflow-y: hidden; height: 100vh"
+      />
+      <div
+        :style="{ width: getDocMainWidth() }"
+        v-show="!isMobile || (isMobile && !showSide)"
+      >
+        <DocHeader />
+        <el-main>
+          <!-- <HelloWorld msg="Hello Vue 3.0 + Element Plus + Vite" /> -->
+          <DocChat />
+        </el-main>
+      </div>
+    </el-container>
   </el-config-provider>
 </template>
 
@@ -27,11 +50,12 @@ import { useChatStore } from "~/store/chat";
 import { useAppStore } from "~/store/app";
 import { storeToRefs } from "pinia";
 import { useDark, useToggle } from "@vueuse/core";
+import { ElLoading } from "element-plus";
 const isDark = useDark();
 
 let chatStore = useChatStore();
 let appStore = useAppStore();
-const { showSide, isMobile } = storeToRefs(appStore);
+const { showSide, isMobile, chatDocument } = storeToRefs(appStore);
 
 const { conversationList, messageList, activeConversationId } =
   storeToRefs(chatStore);
@@ -48,6 +72,21 @@ watch(
   },
   { immediate: true }
 );
+const getDocMainWidth = () => {
+  if (showSide.value) {
+    if (isMobile.value) {
+      return "0px";
+    } else {
+      return "30%";
+    }
+  } else {
+    if (isMobile.value) {
+      return "100vw";
+    } else {
+      return "100vw";
+    }
+  }
+};
 const getMainWidth = () => {
   if (showSide.value) {
     if (isMobile.value) {
@@ -87,8 +126,27 @@ if (appStore.isMobile) {
 } else {
   appStore.showSide = true;
 }
+//重置文档对话状态
+appStore.chatDocument = false;
+//重置loading状态
+appStore.loading = false;
+let loadingDom = null;
 appStore.$subscribe((_, state) => {
   localStorage.setItem("appStore_001", JSON.stringify(state));
+
+  //console.log(state.loading);
+  if (state.loading) {
+    loadingDom = ElLoading.service({
+      lock: true,
+      text: "正在处理中，请稍等...",
+      background: "rgba(255, 255, 255, 0.8)",
+    });
+  } else if (!state.loading) {
+    try {
+      loadingDom.close();
+    } catch (error) {}
+  }
+  //打开loading
 });
 </script>
 
