@@ -81,7 +81,7 @@ const getKnowledge = (parentMessageId: string, isRetry: boolean) => {
   //如果是重试
   if (isRetry) {
     //将输入框的内容设置为parentMessageId的内容
-    chatStore.inputMessage = messageList.find(
+    chatStore.inputMessage = messageList.value.find(
       (i: any) => i.messageId == parentMessageId
     ).content;
   }
