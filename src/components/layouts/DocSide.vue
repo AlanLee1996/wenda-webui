@@ -159,6 +159,7 @@ const changeHandle = (event: any) => {
     case "docx":
       console.log("开始处理word");
       appStore.loading = true;
+      appStore.loadingText = "正在提取word内容";
       fileReader.readAsArrayBuffer(file);
       fileReader.onload = () => {
         fileSrc.value = fileReader.result;
@@ -167,6 +168,7 @@ const changeHandle = (event: any) => {
     case "pdf":
       console.log("开始处理pdf");
       appStore.loading = true;
+      appStore.loadingText = "正在提取pdf内容";
       fileSrc.value = URL.createObjectURL(file);
       getPdfContent();
       break;
@@ -212,6 +214,7 @@ const docxRendered = async () => {
       .catch(function (error) {
         console.log(error);
       });
+    appStore.loadingText = `正在处理第 ${i + 1} / ${elArr.length} 页`;
   }
   appStore.loading = false;
 };
@@ -236,6 +239,7 @@ const getPdfContent = () => {
             .then(function (data) {
               console.log(data);
               successPage++;
+              appStore.loadingText = `正在处理第 ${successPage} / ${pdf.numPages} 页`;
             })
             .catch(function (error) {
               console.log(error);
@@ -249,7 +253,7 @@ const getPdfContent = () => {
         clearInterval(timer);
         appStore.loading = false;
       }
-    }, 100);
+    }, 1000);
   });
 };
 </script>

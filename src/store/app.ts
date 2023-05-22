@@ -4,6 +4,7 @@ export const useAppStore = defineStore('app', {
     state: () => ({
         //加载全屏loading
         loading:false,
+        loadingText:'',
         //菜单状态
         showSide:true,
         //是否手机

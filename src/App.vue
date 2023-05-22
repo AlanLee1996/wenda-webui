@@ -40,6 +40,8 @@
         </el-main>
       </div>
     </el-container>
+
+    <Loading />
   </el-config-provider>
 </template>
 
@@ -50,7 +52,8 @@ import { useChatStore } from "~/store/chat";
 import { useAppStore } from "~/store/app";
 import { storeToRefs } from "pinia";
 import { useDark, useToggle } from "@vueuse/core";
-import { ElLoading } from "element-plus";
+
+import { el } from "element-plus/es/locale";
 const isDark = useDark();
 
 let chatStore = useChatStore();
@@ -130,23 +133,8 @@ if (appStore.isMobile) {
 appStore.chatDocument = false;
 //重置loading状态
 appStore.loading = false;
-let loadingDom = null;
 appStore.$subscribe((_, state) => {
   localStorage.setItem("appStore_001", JSON.stringify(state));
-
-  //console.log(state.loading);
-  if (state.loading) {
-    loadingDom = ElLoading.service({
-      lock: true,
-      text: "正在处理中，请稍等...",
-      background: "rgba(255, 255, 255, 0.8)",
-    });
-  } else if (!state.loading) {
-    try {
-      loadingDom.close();
-    } catch (error) {}
-  }
-  //打开loading
 });
 </script>
 
