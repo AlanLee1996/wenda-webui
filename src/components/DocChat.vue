@@ -225,8 +225,7 @@ const copyLastMessage = () => {
   }
   try {
     //取到上条用户发送的消息内容
-    let messageList = docChatStore.docMessageList;
-    let lastMsgContent = messageList
+    let lastMsgContent = messageList.value
       .filter((i: any) => i.role == "user")
       .pop().content;
     //复制到编辑框
