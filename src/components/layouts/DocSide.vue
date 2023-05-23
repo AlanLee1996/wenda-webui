@@ -201,11 +201,13 @@ const docxRendered = async () => {
   docChatStore.doc_id = fileId.value;
 
   let elArr = document.getElementsByClassName("docx");
+  let fullContent = "";
   for (let i = 0; i < elArr.length; i++) {
     let element = elArr[i];
 
     let text = element.textContent;
     //console.log(text);
+    fullContent += text;
     await chatStore
       .uploadToRtst(fileId.value, `第${i + 1}页`, text)
       .then(function (data) {
@@ -216,7 +218,15 @@ const docxRendered = async () => {
       });
     appStore.loadingText = `正在处理第 ${i + 1} / ${elArr.length} 页`;
   }
-  appStore.loading = false;
+  appStore.loadingText = `正在处理全文`;
+  chatStore
+    .uploadToRtst(fileId.value, `全文`, fullContent)
+    .then(function (data) {
+      appStore.loading = false;
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
 };
 //提取pdf内容
 const getPdfContent = () => {
@@ -224,20 +234,22 @@ const getPdfContent = () => {
   docChatStore.doc_id = fileId.value;
   console.log("开始提取pdf内容");
   let loadingTask = PdfJs.getDocument(fileSrc.value);
-  loadingTask.promise.then((pdf: PDFDocumentProxy) => {
+  loadingTask.promise.then(async (pdf: PDFDocumentProxy) => {
     let successPage = 0;
+    let fullContent = "";
     for (let i = 1; i <= pdf.numPages; i++) {
-      pdf.getPage(i).then((page: any) => {
-        page.getTextContent().then(async (textContent: any) => {
+      await pdf.getPage(i).then(async (page: any) => {
+        await page.getTextContent().then(async (textContent: any) => {
           let pdfContent = "";
           textContent.items.forEach((textItem: any) => {
             pdfContent += textItem.str;
           });
-          //console.log(i, pdfContent);
+          //console.log(i);
+          fullContent += pdfContent;
           chatStore
             .uploadToRtst(fileId.value, `第${i}页`, pdfContent)
             .then(function (data) {
-              console.log(data);
+              //console.log(data);
               successPage++;
               appStore.loadingText = `正在处理第 ${successPage} / ${pdf.numPages} 页`;
             })
@@ -251,7 +263,15 @@ const getPdfContent = () => {
     let timer = setInterval(() => {
       if (successPage == pdf.numPages) {
         clearInterval(timer);
-        appStore.loading = false;
+        appStore.loadingText = `正在处理全文`;
+        chatStore
+          .uploadToRtst(fileId.value, `全文`, fullContent)
+          .then(function (data) {
+            appStore.loading = false;
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
       }
     }, 1000);
   });
