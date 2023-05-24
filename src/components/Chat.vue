@@ -151,13 +151,17 @@ const getKnowledge = (parentMessageId: string, isRetry: boolean) => {
           lastMsg = messageList.history[lastIndex - 1];
         }
 
-        //合并数据源并生成prompt
-        chatStore.finallyPrompt = chatStore.promptTemplate
-          .replace("{{问题}}", chatStore.inputMessage)
-          .replace(
-            "{{知识库}}",
-            response.data.map((i: any) => i.content).join("\n")
-          );
+        //如果信息来源不为空，合并数据源并生成prompt
+        if (response.data.length > 0) {
+          chatStore.finallyPrompt = chatStore.promptTemplate
+            .replace("{{问题}}", chatStore.inputMessage)
+            .replace(
+              "{{知识库}}",
+              response.data.map((i: any) => i.content).join("\n")
+            );
+        } else {
+          chatStore.finallyPrompt = chatStore.inputMessage;
+        }
 
         chatStore.sendMessage(lastMsg);
       })
