@@ -9,11 +9,9 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    App: typeof import('./components/layouts/App.vue')['default']
     BaseHeader: typeof import('./components/layouts/BaseHeader.vue')['default']
     BaseSide: typeof import('./components/layouts/BaseSide.vue')['default']
     Chat: typeof import('./components/Chat.vue')['default']
-    copy: typeof import('./components/HelloWorld copy.vue')['default']
     DocChat: typeof import('./components/DocChat.vue')['default']
     DocHeader: typeof import('./components/layouts/DocHeader.vue')['default']
     DocSide: typeof import('./components/layouts/DocSide.vue')['default']
