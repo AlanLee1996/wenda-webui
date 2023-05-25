@@ -1,4 +1,4 @@
-<h1 align="center">wenda-webui</h1>
+<h1 align="center"><img src="https://github.com/AlanLee1996/wenda-webui/blob/main/demo_img/wenda.png?raw=true"></h1>
 
 ## 专为 wenda 设计的 webui
 
