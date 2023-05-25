@@ -25,10 +25,9 @@ const about = () => {
   );
 };
 const settingsDialog = ref();
-const currentInstance = getCurrentInstance();
+let { proxy } = getCurrentInstance();
 const settings = () => {
-  //console.log(currentInstance.ctx.$refs.settingsDialog.visible);
-  currentInstance.ctx.$refs.settingsDialog.visible = true;
+  proxy.$refs.settingsDialog.visible = true;
 };
 const settingsDisplay = ref(false);
 const reactiveObj = reactive({
