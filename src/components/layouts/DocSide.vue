@@ -218,15 +218,16 @@ const docxRendered = async () => {
       });
     appStore.loadingText = `正在处理第 ${i + 1} / ${elArr.length} 页`;
   }
-  appStore.loadingText = `正在处理全文`;
-  chatStore
-    .uploadToRtst(fileId.value, `全文`, fullContent)
-    .then(function (data) {
-      appStore.loading = false;
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+  appStore.loading = false;
+  // appStore.loadingText = `正在处理全文`;
+  // chatStore
+  //   .uploadToRtst(fileId.value, `全文`, fullContent)
+  //   .then(function (data) {
+  //     appStore.loading = false;
+  //   })
+  //   .catch(function (error) {
+  //     console.log(error);
+  //   });
 };
 //提取pdf内容
 const getPdfContent = () => {
@@ -244,7 +245,7 @@ const getPdfContent = () => {
           textContent.items.forEach((textItem: any) => {
             pdfContent += textItem.str;
           });
-          //console.log(i);
+          console.log(i);
           fullContent += pdfContent;
           chatStore
             .uploadToRtst(fileId.value, `第${i}页`, pdfContent)
@@ -263,15 +264,16 @@ const getPdfContent = () => {
     let timer = setInterval(() => {
       if (successPage == pdf.numPages) {
         clearInterval(timer);
-        appStore.loadingText = `正在处理全文`;
-        chatStore
-          .uploadToRtst(fileId.value, `全文`, fullContent)
-          .then(function (data) {
-            appStore.loading = false;
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+        appStore.loading = false;
+        // appStore.loadingText = `正在处理全文`;
+        // chatStore
+        //   .uploadToRtst(fileId.value, `全文`, fullContent)
+        //   .then(function (data) {
+        //     appStore.loading = false;
+        //   })
+        //   .catch(function (error) {
+        //     console.log(error);
+        //   });
       }
     }, 1000);
   });
