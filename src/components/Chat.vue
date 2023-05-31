@@ -163,7 +163,14 @@ const getKnowledge = (parentMessageId: string, isRetry: boolean) => {
           chatStore.finallyPrompt = chatStore.inputMessage;
         }
 
-        chatStore.sendMessage(lastMsg);
+        chatStore.sendMessage(chatStore.finallyPrompt, (data: any) => {
+          if (data != "{{successEnd}}") {
+            lastMsg.content = data;
+          } else {
+            chatStore.inputMessage = "";
+            chatStore.isSending = false;
+          }
+        });
       })
       .catch(function (error) {
         console.log(error);
@@ -189,7 +196,14 @@ const getKnowledge = (parentMessageId: string, isRetry: boolean) => {
     chatStore.finallyPrompt = chatStore.inputMessage;
     console.log("重试消息", lastMsg);
 
-    chatStore.sendMessage(lastMsg);
+    chatStore.sendMessage(chatStore.finallyPrompt, (data: any) => {
+      if (data != "{{successEnd}}") {
+        lastMsg.content = data;
+      } else {
+        chatStore.inputMessage = "";
+        chatStore.isSending = false;
+      }
+    });
   }
 };
 //删除消息
@@ -302,7 +316,7 @@ const copyLastMessage = () => {
 
 <template>
   <el-scrollbar
-    style="padding: 0px 10px 0px 0px; height: calc(100vh - 200px)"
+    style="padding: 0px 20px 0px 0px; height: calc(100vh - 200px)"
     ref="chatScroll"
   >
     <div ref="chatInner">

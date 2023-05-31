@@ -101,7 +101,7 @@ export const useChatStore = defineStore("chat", {
       );
       messageList.history.splice(index, 1);
     },
-
+    //ws聊天实现
     async send_raw(prompt: any, onmessage: any) {
       let result = "";
       await new Promise((resolve) => {
@@ -145,30 +145,12 @@ export const useChatStore = defineStore("chat", {
     },
 
     //发送消息
-    async sendMessage(lastMsg: any) {
+    async sendMessage(finallyPrompt: any, onMessage: any) {
       let sendtime = dayjs().format("YYYY-MM-DD hh:mm:ss");
 
-      //中断控制
-      let controller = new AbortController();
-      let signal = controller.signal;
-      let sendStop = () => {
-        controller.abort();
-        controller = new AbortController();
-        signal = controller.signal;
-      };
-      function MyException(message: string) {
-        lastMsg.content = message;
-      }
-
       //发送消息
-      this.inputMessage = "";
-      this.send_raw(this.finallyPrompt, (data: any) => {
-        //console.log(data);
-        if (data != "{{successEnd}}") {
-          lastMsg.content = data;
-        } else {
-          this.isSending = false;
-        }
+      this.send_raw(finallyPrompt, (data: any) => {
+        onMessage(data);
       });
     },
     //存储文本进知识分区

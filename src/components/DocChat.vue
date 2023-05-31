@@ -148,8 +148,14 @@ const getKnowledge = (parentMessageId: string, isRetry: boolean) => {
           response.data.map((i: any) => i.content).join("\n")
         );
       //console.log(chatStore.finallyPrompt);
-
-      docChatStore.sendMessage(lastMsg);
+      chatStore.sendMessage(chatStore.finallyPrompt, (data: any) => {
+        if (data != "{{successEnd}}") {
+          lastMsg.content = data;
+        } else {
+          chatStore.inputMessage = "";
+          chatStore.isSending = false;
+        }
+      });
     })
     .catch(function (error) {
       console.log(error);
