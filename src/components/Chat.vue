@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import imgAi from "~/assets/head.png";
 
-import { ref, reactive, toRefs, defineProps, onMounted } from "vue";
+import { ref, reactive, toRefs, defineProps, onMounted, watch } from "vue";
 import axios from "axios";
 import { ElMessage, ElNotification } from "element-plus";
 import { useChatStore } from "~/store/chat";
@@ -206,12 +206,24 @@ const deleteMessage = (messageId: string) => {
 const chatScroll = ref(null);
 const chatInner = ref(null);
 onMounted(() => {
+  chatScroll.value.setScrollTop(chatInner.value.scrollHeight);
   setInterval(() => {
     if (chatStore.isSending) {
       chatScroll.value.setScrollTop(chatInner.value.scrollHeight);
     }
   }, 100);
 });
+//切换会话自动滚动到底部
+watch(
+  () => chatStore.activeConversationId,
+  () => {
+    console.log("切换会话");
+
+    setTimeout(() => {
+      chatScroll.value.setScrollTop(chatInner.value.scrollHeight);
+    }, 500);
+  }
+);
 //获取消息在不同状态下的背景颜色
 const getMsgBackColor = (role: string) => {
   if (role == "user") {
