@@ -110,7 +110,7 @@ export const useChatStore = defineStore("chat", {
         if (apiUrl) {
           ws = new WebSocket(apiUrl.replace("http", "ws") + "/ws");
         } else {
-          ws = new WebSocket(location.href.replace("http", "ws") + "ws");
+          ws = new WebSocket(location.origin.replace("http", "ws") + "ws");
         }
 
         ws.onmessage = (event: any) => {
