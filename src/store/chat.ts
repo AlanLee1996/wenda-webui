@@ -107,10 +107,10 @@ export const useChatStore = defineStore("chat", {
       await new Promise((resolve) => {
         let apiUrl = import.meta.env.VITE_WENDA_URL;
         let ws: any;
-        if (apiUrl == "/") {
-          ws = new WebSocket(location.href.replace("http", "ws") + "ws");
-        } else {
+        if (apiUrl) {
           ws = new WebSocket(apiUrl.replace("http", "ws") + "/ws");
+        } else {
+          ws = new WebSocket(location.href.replace("http", "ws") + "ws");
         }
 
         ws.onmessage = (event: any) => {
