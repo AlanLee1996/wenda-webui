@@ -209,7 +209,7 @@ const docxRendered = async () => {
     //console.log(text);
     fullContent += text;
     await chatStore
-      .uploadToRtst(fileId.value, `第${i + 1}页`, text)
+      .uploadToRtst(fileId.value, `文档【第${i}页】`, text)
       .then(function (data) {
         console.log(data);
       })
@@ -218,15 +218,7 @@ const docxRendered = async () => {
       });
     appStore.loadingText = `正在处理第 ${i + 1} / ${elArr.length} 页`;
   }
-  appStore.loadingText = `正在处理全文`;
-  chatStore
-    .uploadToRtst(fileId.value, `全文`, fullContent)
-    .then(function (data) {
-      appStore.loading = false;
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+  appStore.loading = false;
 };
 //提取pdf内容
 const getPdfContent = () => {
@@ -238,40 +230,34 @@ const getPdfContent = () => {
     let successPage = 0;
     let fullContent = "";
     for (let i = 1; i <= pdf.numPages; i++) {
+      let pageObj: any;
       await pdf.getPage(i).then(async (page: any) => {
-        await page.getTextContent().then(async (textContent: any) => {
-          let pdfContent = "";
-          textContent.items.forEach((textItem: any) => {
-            pdfContent += textItem.str;
-          });
-          //console.log(i);
-          fullContent += pdfContent;
-          chatStore
-            .uploadToRtst(fileId.value, `第${i}页`, pdfContent)
-            .then(function (data) {
-              //console.log(data);
-              successPage++;
-              appStore.loadingText = `正在处理第 ${successPage} / ${pdf.numPages} 页`;
-            })
-            .catch(function (error) {
-              console.log(error);
-            });
-        });
+        pageObj = page;
       });
+      let pdfContent = "";
+      await pageObj.getTextContent().then(async (textContent: any) => {
+        textContent.items.forEach((textItem: any) => {
+          pdfContent += textItem.str;
+        });
+        console.log(i);
+        fullContent += pdfContent;
+      });
+      await chatStore
+        .uploadToRtst(fileId.value, `文档【第${i}页】`, pdfContent)
+        .then(function (data) {
+          //console.log(data);
+          successPage++;
+          appStore.loadingText = `正在处理第 ${successPage} / ${pdf.numPages} 页`;
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
     }
     //等待所有页上传完成
     let timer = setInterval(() => {
       if (successPage == pdf.numPages) {
         clearInterval(timer);
-        appStore.loadingText = `正在处理全文`;
-        chatStore
-          .uploadToRtst(fileId.value, `全文`, fullContent)
-          .then(function (data) {
-            appStore.loading = false;
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+        appStore.loading = false;
       }
     }, 1000);
   });

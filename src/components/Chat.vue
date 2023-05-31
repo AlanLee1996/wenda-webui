@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import imgAi from "~/assets/head.png";
 
-import { ref, reactive, toRefs, defineProps, onMounted } from "vue";
+import { ref, reactive, toRefs, defineProps, onMounted, watch } from "vue";
 import axios from "axios";
 import { ElMessage, ElNotification } from "element-plus";
 import { useChatStore } from "~/store/chat";
@@ -163,7 +163,14 @@ const getKnowledge = (parentMessageId: string, isRetry: boolean) => {
           chatStore.finallyPrompt = chatStore.inputMessage;
         }
 
-        chatStore.sendMessage(lastMsg);
+        chatStore.sendMessage(chatStore.finallyPrompt, (data: any) => {
+          if (data != "{{successEnd}}") {
+            lastMsg.content = data;
+          } else {
+            chatStore.inputMessage = "";
+            chatStore.isSending = false;
+          }
+        });
       })
       .catch(function (error) {
         console.log(error);
@@ -189,7 +196,14 @@ const getKnowledge = (parentMessageId: string, isRetry: boolean) => {
     chatStore.finallyPrompt = chatStore.inputMessage;
     console.log("重试消息", lastMsg);
 
-    chatStore.sendMessage(lastMsg);
+    chatStore.sendMessage(chatStore.finallyPrompt, (data: any) => {
+      if (data != "{{successEnd}}") {
+        lastMsg.content = data;
+      } else {
+        chatStore.inputMessage = "";
+        chatStore.isSending = false;
+      }
+    });
   }
 };
 //删除消息
@@ -206,12 +220,24 @@ const deleteMessage = (messageId: string) => {
 const chatScroll = ref(null);
 const chatInner = ref(null);
 onMounted(() => {
+  chatScroll.value.setScrollTop(chatInner.value.scrollHeight);
   setInterval(() => {
     if (chatStore.isSending) {
       chatScroll.value.setScrollTop(chatInner.value.scrollHeight);
     }
   }, 100);
 });
+//切换会话自动滚动到底部
+watch(
+  () => chatStore.activeConversationId,
+  () => {
+    console.log("切换会话");
+
+    setTimeout(() => {
+      chatScroll.value.setScrollTop(chatInner.value.scrollHeight);
+    }, 500);
+  }
+);
 //获取消息在不同状态下的背景颜色
 const getMsgBackColor = (role: string) => {
   if (role == "user") {
@@ -290,7 +316,7 @@ const copyLastMessage = () => {
 
 <template>
   <el-scrollbar
-    style="padding: 0px 10px 0px 0px; height: calc(100vh - 200px)"
+    style="padding: 0px 20px 0px 0px; height: calc(100vh - 200px)"
     ref="chatScroll"
   >
     <div ref="chatInner">

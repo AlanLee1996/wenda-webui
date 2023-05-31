@@ -1,4 +1,4 @@
-<h1 align="center">wenda-webui</h1>
+<h1 align="center"><img src="https://github.com/AlanLee1996/wenda-webui/blob/main/demo_img/wenda.png?raw=true"></h1>
 
 ## 专为 wenda 设计的 webui
 
@@ -32,6 +32,7 @@
 
 ### 更新内容
 
+- 2023/5/31 更新适配 websocket,优化细节，详见 commit
 - 2023/5/19 新增文档对话功能，支持 pdf、docx
 - 2023/5/15 完善配置文件和设置功能,完整适配手机
 - 2023/4/27 测试版发布

@@ -15,9 +15,10 @@ const { showSide, isMobile } = storeToRefs(appStore);
 const about = () => {
   ElMessageBox.alert(
     `
-  本项目是专为 <a href="https://github.com/l15y/wenda" target="_blank">闻达</a> 设计的webui。<br>
-  本项目git地址： <a href="https://github.com/AlanLee1996/wenda-webui" target="_blank">wenda-webui</a>
-  `,
+    本项目是专为 <a href="https://github.com/l15y/wenda" target="_blank">闻达</a> 设计的webui。<br>
+    闻达内置版本更新周期较长，生产环境建议fork本项目。<br>
+    本项目git地址： <a href="https://github.com/AlanLee1996/wenda-webui" target="_blank">wenda-webui</a>，欢迎star！
+    `,
     "关于本项目",
     {
       dangerouslyUseHTMLString: true,
