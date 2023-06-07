@@ -39,6 +39,15 @@
         placeholder="Prompt模板"
       />
     </div>
+    <div class="slider-block">
+      <span class="demonstration">聊天记录导出</span>
+      <el-button type="primary" plain @click="exportHistory('current')">
+        导出当前会话
+      </el-button>
+      <el-button type="primary" plain @click="exportHistory('all')">
+        导出所有
+      </el-button>
+    </div>
 
     <template #footer>
       <span class="dialog-footer">
@@ -61,6 +70,48 @@ const visible = ref(false);
 defineExpose({
   visible,
 });
+const downloadTextFile = (text: String, filename: String) => {
+  // 创建一个Blob对象，并设置其类型为文本/plain
+  const blob = new Blob([text], { type: "text/plain" });
+
+  // 创建一个临时URL，用于生成下载链接
+  const url = URL.createObjectURL(blob);
+
+  // 创建一个<a>元素，设置其属性为下载链接
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+
+  // 将<a>元素隐藏并添加到文档中
+  a.style.display = "none";
+  document.body.appendChild(a);
+
+  // 模拟点击<a>元素以触发下载
+  a.click();
+
+  // 清理临时URL和<a>元素
+  URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+};
+const exportHistory = (type: string) => {
+  if (type == "current") {
+    let history: any = chatStore.getMessageByConversationId(
+      chatStore.activeConversationId
+    );
+    let filename = history.conversationId + ":聊天记录导出.txt";
+    history = JSON.stringify(history);
+
+    downloadTextFile(history, filename);
+  } else if (type == "all") {
+    let history: any = chatStore.messageList;
+    history = JSON.stringify(history);
+    let filename = "聊天记录导出.txt";
+    downloadTextFile(history, filename);
+  }
+  // let text = "这是一段示例文本。";
+  // let filename = "聊天记录导出.txt";
+  // downloadTextFile(text, filename);
+};
 </script>
 <style>
 .slider-block {
