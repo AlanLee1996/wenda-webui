@@ -194,7 +194,6 @@ const getKnowledge = (parentMessageId: string, isRetry: boolean) => {
 
     //生成prompt
     chatStore.finallyPrompt = chatStore.inputMessage;
-    console.log("重试消息", lastMsg);
 
     chatStore.sendMessage(chatStore.finallyPrompt, (data: any) => {
       if (data != "{{successEnd}}") {
