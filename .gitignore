@@ -6,6 +6,7 @@ dist
 dist-ssr
 *.local
 .history
+.env.development
 
 # lock
 yarn.lock

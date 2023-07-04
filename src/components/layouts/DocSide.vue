@@ -67,15 +67,15 @@
       "
     >
       <div style="margin-bottom: 5px">
-        <el-button @click="selectFile()" style="margin-right: 0px"
+        <el-button @click="selectFile()" style="margin-right: 0px; padding: 3px"
           >上传文档</el-button
         >
-        <el-button @click="copyTxt()" style="margin-right: 10px"
+        <el-button @click="copyTxt()" style="margin-right: 10px; padding: 3px"
           >粘贴文本</el-button
         >
         <el-button
           @click="chatDocument = false"
-          style="margin: 0"
+          style="margin: 0; padding: 3px"
           color="#ef534f"
           :dark="isDark"
           plain
