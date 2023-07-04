@@ -6,7 +6,7 @@
         v-model="chatStore.max_length"
         :step="10"
         :min="1000"
-        :max="4000"
+        :max="100000"
         show-input
       />
     </div>
@@ -15,7 +15,7 @@
       <el-slider
         v-model="chatStore.temperature"
         :step="0.1"
-        :min="0"
+        :min="0.1"
         :max="2"
         show-input
       />
@@ -25,7 +25,7 @@
       <el-slider
         v-model="chatStore.top_p"
         :step="0.1"
-        :min="0"
+        :min="0.1"
         :max="1"
         show-input
       />

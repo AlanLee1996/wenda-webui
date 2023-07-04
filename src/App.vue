@@ -26,7 +26,7 @@
     >
       <DocSide
         v-show="showSide"
-        :style="{ width: '70%' }"
+        :style="{ width: isMobile ? '100vw' : '70%' }"
         style="overflow-y: hidden; height: 100vh"
       />
       <div

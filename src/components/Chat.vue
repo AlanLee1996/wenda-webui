@@ -248,38 +248,44 @@ const getMsgBackColor = (role: string) => {
 //跳转到数据来源
 const jumpToSource = (content: any) => {
   content = content.title;
-  if (content.indexOf("](http") != -1) {
-    const regex = /\[([^\]]+)\]\((http[s]?:\/\/[^\)]+)\)/;
-    const matches = content.match(regex);
-    if (matches) {
-      const url = matches[2]; // 获取 URL
-      console.log(`URL: ${url}`);
-      window.open(url);
+
+  let regex = /\[.*?\]\((.*?)\)/;
+  let matches = content.match(regex);
+  if (matches && matches.length > 1) {
+    let extractedLink = matches[1];
+    console.log(`URL: ${extractedLink}`);
+    if (extractedLink.indexOf("http") != -1) {
+      window.open(extractedLink);
     } else {
-      ElMessage.warning("该来源无法直接打开！");
+      extractedLink = import.meta.env.VITE_WENDA_URL + extractedLink;
+      window.open(extractedLink);
     }
   } else {
     ElMessage.warning("该来源无法直接打开！");
   }
 };
-//获取数据来源的相关信息
 const getSorceInfo = (content: any, type: string) => {
   if (type == "title" || type == "url") {
     content = content.title;
-    if (content.indexOf("](http") != -1) {
-      const regex = /\[([^\]]+)\]\((http[s]?:\/\/[^\)]+)\)/;
-      const matches = content.match(regex);
 
-      if (matches) {
-        const title = matches[1]; // 获取标题
-        const url = matches[2]; // 获取 URL
-      } else {
-        console.log("No matches found.");
-      }
+    let regex = /\[.*?\]\((.*?)\)/;
+    let matches = content.match(regex);
+    if (matches && matches.length > 1) {
+      const extractedLink = matches[1];
+
       if (type == "title") {
-        return matches[1];
+        let regex1 = /\[(.*?)\]\([^)]*\)/;
+        let matches1 = content.match(regex1);
+
+        if (matches1 && matches1.length >= 2) {
+          const fileName = matches1[1];
+          return fileName;
+        } else {
+          console.log("未找到文件名");
+          return "未找到文件名";
+        }
       } else if (type == "url") {
-        return matches[2];
+        return extractedLink;
       }
     } else {
       return content;
